@@ -50,7 +50,7 @@ Behavioral Cloning
 2.  Run behavioral cloning (BC) and report results on two tasks: the Walker2d
     environment, where a behavioral cloning agent should achieve at
     least 30% of the performance of the expert, and one environment of
-    your choosing where it does not. Here is how you can run the Ant
+    your choosing where it does not. Here is how you can run the Walker2d
     task:
 
     ``` {.bash language="bash"}
@@ -64,11 +64,11 @@ Behavioral Cloning
 
     ``` {escapechar="@"}
     env: 
-      expert_policy_file: ../../../hw1/roble/policies/experts/Ant.pkl
-      expert_data: ../../../hw1/roble/expert_data/labelled_data_Ant-v2.pkl
-      expert_unlabelled_data: ../../../hw1/roble/expert_data/unlabelled_data_Ant-v2.pkl
+      expert_policy_file: ../../../hw1/roble/policies/experts/Walker2d.pkl
+      expert_data: ../../../hw1/roble/expert_data/labelled_data_Walker-v2.pkl
+      expert_unlabelled_data: ../../../hw1/roble/expert_data/unlabelled_data_HalfCheetah-v2.pkl
       exp_name: "bob"
-      env_name: Ant-v2 # choices are [Ant-v2, Humanoid-v2, Walker2d-v2, HalfCheetah-v2, Hopper-v2]
+      env_name: Walker2d-v2 # choices are [Ant-v2, Humanoid-v2, Walker2d-v2, HalfCheetah-v2, Hopper-v2]
       max_episode_length: 100 
       render: false
       
@@ -91,7 +91,7 @@ Behavioral Cloning
     comparison in terms of network size, amount of data, and number of
     training iterations. Provide these details (and any others you feel
     are appropriate) in the table caption. Submit your log file
-    *data/\.../log\_file.log* on Gradescope as *ant1-2.log* for your Ant
+    *data/\.../log\_file.log* on Gradescope as *walker1-2.log* for your Walker
     run and *custom1-2.log* for the run of your choosing.
 
     **Note**: What "report the mean and standard deviation" means is that
@@ -157,7 +157,7 @@ Step-by-step guide:
 -   Set *train\_idm* to True in the config file and make sure the
     *expert\_unlabelled\_data* variable in the config file also points
     to the correct path. E.g. :
-    *../../../hw1/roble/expert\_data/unlabelled/unlabelled\_data\_Ant-v2.pkl*
+    *../../../hw1/roble/expert\_data/unlabelled/unlabelled\_data\_HalfCheetah-v2.pkl*
 
 Once the IDM is correctly implemented, run the code again with the
 config variable *train\_idm* set to True:
@@ -176,7 +176,7 @@ that you implemented in the *train\_idm()* (see the TODO in the
 *run\_training\_loop()* function in
 *hw1/roble/infrastructure/rl\_trainer.py*) function, and make a bar plot
 that compares the performance that the BC agent achieves when trained on
-1) the original expert data and 2) the labelled data. Use the Ant-v2 and
+1) the original expert data and 2) the labelled data. Use the Walker2d-v2 and
 HalfCheetah environments. You can modify some hyperparameters but make
 sure to set up a fair comparison between the 2 settings.
 
@@ -199,7 +199,7 @@ DAgger
     ```
 
 2.  Run DAgger and report results on the two tasks you tested previously
-    with behavioral cloning (i.e., Ant + another environment). Report
+    with behavioral cloning (i.e., Walker + another environment). Report
     your results in the form of a learning curve, plotting the number of
     DAgger iterations vs. the policy's mean return, with error bars to
     show the standard deviation. Include the performance of the expert
@@ -207,7 +207,7 @@ DAgger
     horizontal lines that go across the plot). In the caption, state
     which task you used, and any details regarding network architecture,
     amount of data, etc. (as in the previous section). Submit the log
-    file of your Ant run on Gradescope as *dagger\_ant2-2.log*.
+    file of your Walker run on Gradescope as *dagger\_Walker2-2.log*.
 
 **Bonus**:
 1. Use Dagger in the OGBench task to improve the Goal Conditioned BC model.
@@ -264,8 +264,8 @@ Turning it in {#sec:turn-it-in}
     anchor=west, calign=first, edge path= (!u.south west) +(7.5pt,0) \|-
     node\[fill,inner sep=1.25pt\] (.child anchor); , before typesetting
     nodes= if n=1 insert before=\[,phantom\] , fit=band, before
-    computing xy=l=15pt, \[submit.zip \[hw1 \[run\_logs \[q1\_bc\_ant
-    \[log\_data.csv\] \[videos\] \] \[q2\_dagger\_ant \[log\_data.csv\]
+    computing xy=l=15pt, \[submit.zip \[hw1 \[run\_logs \[q1\_bc\_walker2d
+    \[log\_data.csv\] \[videos\] \] \[q2\_dagger\_walker2d \[log\_data.csv\]
     \[videos\] \] \[\...\] \] \[roble \[agents \[bc\_agent.py\] \[\...\]
     \] \[policies \[\...\] \] \[\...\] \] \[\...\] \] \[conf
     \[config\_hw1.yaml\] \] \[Dockerfile\] \[diff.txt\] \[\...\] \]
