@@ -33,7 +33,7 @@ Behavioral Cloning
     We recommend that you read the files in the following order. For
     some files, you will need to fill in blanks, labeled `TODO`.
 
-    -   `run_hw1.py`
+    -   `hw1.py`
 
     -   `infrastructure/rl_trainer.py`
 
@@ -122,9 +122,7 @@ Behavioral Cloning
 
 
 4. Scaling up training. 
-Train a network on the [OGBench](https://arxiv.org/abs/2410.20092) *visual-cube-triple-play-v0* dataset.
-[OGBench](https://arxiv.org/abs/2410.20092) uses images of size is 64 × 64 × 3.
-Make a 3 layer CNN and train on this dataset and test on the environment. While the OGBench code is mostly jax we are using Pytorch. We are not using their code to train, just their code for the dataset and environment.
+Train a network on the [OGBench](https://arxiv.org/abs/2410.20092) *visual-cube-triple-play-v0* dataset, which acheives about 15% success in the paper. [OGBench](https://arxiv.org/abs/2410.20092) uses images of size is 64 × 64 × 3. Make a 3 layer CNN and train on this dataset and test on the environment. The dataset is rather large, instead of using the entire dataset you should pull just reduced segment of the dataset that will fit on your computer. While the OGBench code is mostly jax we are using Pytorch. We are not using their code to train, just their code for the dataset and environment.
 - Add an input to your CNN model for the goal
 - Plot your performance
 
