@@ -63,7 +63,7 @@ The provided [code](mini-grp.py) is an example of a vision transformer. Modifiy 
 
 ### Discrete vs Continuous Action Space
 
-There are different methods that can be used to model the action distribution. Many papers have discretetized the action space (OpenAI Hand), resulting in good performance. Train the GRP model with a discrete representation (cross entropy) vs a continuous representation (MSE) and compare the performance of these two distributions. Compare the performance in [simpleEnv](https://github.com/milarobotlearningcourse/SimplerEnv)
+Different methods can be used to model the action distribution. Many papers have discretized the action space (e.g. OpenAI Hand), resulting in a good performance. Train the GRP model with a discrete representation (cross-entropy) vs a continuous representation (MSE) and compare the performance of these two distributions. Compare the performance in [simpleEnv](https://github.com/milarobotlearningcourse/SimplerEnv)
 
 **For all the following parts of the assignment, use the continuous representation model for the analysis.**
 
@@ -82,7 +82,7 @@ The dataset used for training is relatively small (100 trajectories) but works a
 
 ## State History
 
-For most robotics problems, a single image is not enough to determine the dynamics well enough to predict the next state. This lack of dynamics information means the model can only solve certain tasks to a limited extent. To provide the model with sufficient state information, update the GRP input to include 2 images from the state history and evaluate the performance of this new model. Remark on the change in performance.
+For most robotics problems, a single image is not enough to determine the dynamics well enough to predict the next state. This lack of dynamics information means the model can only solve certain tasks to a limited extent. To provide the model with sufficient state information, update the GRP input to include two images from the state history and evaluate the performance of this new model. Remark on the change in performance.
 
 ## Action Chunking
 
