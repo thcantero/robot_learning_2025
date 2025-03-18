@@ -8,8 +8,8 @@ import numpy as np
 import torch
 from torch import distributions
 
-from hw5.roble.infrastructure import pytorch_util as ptu
-from hw5.roble.policies.base_policy import BasePolicy
+from hw8.roble.infrastructure import pytorch_util as ptu
+from hw8.roble.policies.base_policy import BasePolicy
 
 
 class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
@@ -85,8 +85,27 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
     ##################################
     # query the policy with observation(s) to get selected action(s)
     def get_action(self, obs: np.ndarray) -> np.ndarray:
-        # TODO: get this from hw3
-        pass
+        if len(obs.shape) > 1:
+            observation = obs
+        else:
+            observation = obs[None]
+
+        observation = torch.tensor(observation, dtype=torch.float32).to(ptu.device)
+        
+        if self.discrete:
+            logits = self.logits_na(observation)
+            action_distribution = distributions.Categorical(logits=logits)
+            action = action_distribution.sample()
+        else:
+            if self._deterministic:
+                # For continuous deterministic, use mean directly
+                action = self.mean_net(observation)
+            else:
+                # For stochastic, sample from distribution
+                action_distribution = self.forward(observation)
+                action = action_distribution.sample()
+        
+        return ptu.to_numpy(action.squeeze(0))
 
     # update/train this policy
     def update(self, observations, actions, **kwargs):

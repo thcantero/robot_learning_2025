@@ -9,7 +9,7 @@ import numpy as np
 from torch import nn
 import torch.optim as optim
 
-from hw5.roble.infrastructure.atari_wrappers import wrap_deepmind
+from hw8.roble.infrastructure.atari_wrappers import wrap_deepmind
 from gym.envs.registration import register
 
 import torch
@@ -31,38 +31,38 @@ def register_custom_envs():
     if 'LunarLander-v3' not in registry.env_specs:
         register(
             id='LunarLander-v3',
-            entry_point='roble.envs.box2d.lunar_lander:LunarLander',
+            entry_point='hw8.roble.envs.box2d.lunar_lander:LunarLander',
             max_episode_steps=1000,
             reward_threshold=200,
         )
     if 'DrunkSpider-v0' not in registry.env_specs:
         register(
             id='DrunkSpider-v0',
-            entry_point='roble.envs.drunkspider.drunkspider:DrunkSpider',
+            entry_point='hw8.roble.envs.drunkspider.drunkspider:DrunkSpider',
             kwargs={}
         )
     if 'PointmassEasy-v0' not in registry.env_specs:
         register(
             id='PointmassEasy-v0',
-            entry_point='roble.envs.pointmass.pointmass:Pointmass',
+            entry_point='hw8.roble.envs.pointmass.pointmass:Pointmass',
             kwargs={'difficulty': 0}
         )
     if 'PointmassMedium-v0' not in registry.env_specs:
         register(
             id='PointmassMedium-v0',
-            entry_point='roble.envs.pointmass.pointmass:Pointmass',
+            entry_point='hw8.roble.envs.pointmass.pointmass:Pointmass',
             kwargs={'difficulty': 1}
         )
     if 'PointmassHard-v0' not in registry.env_specs:
         register(
             id='PointmassHard-v0',
-            entry_point='roble.envs.pointmass.pointmass:Pointmass',
+            entry_point='hw8.roble.envs.pointmass.pointmass:Pointmass',
             kwargs={'difficulty': 2}
         )
     if 'PointmassVeryHard-v0' not in registry.env_specs:
         register(
             id='PointmassVeryHard-v0',
-            entry_point='roble.envs.pointmass.pointmass:Pointmass',
+            entry_point='hw8.roble.envs.pointmass.pointmass:Pointmass',
             kwargs={'difficulty': 3}
         )
 
@@ -79,7 +79,7 @@ def get_env_kwargs(env_name):
             'grad_norm_clipping': 10,
             'input_shape': (84, 84, 4),
             'env_wrappers': wrap_deepmind,
-            'frame_history_len': 4,
+            'frame_history_len': 1,
             'gamma': 0.99,
         }
         kwargs['optimizer_spec'] = atari_optimizer(kwargs['num_timesteps'])
@@ -167,10 +167,13 @@ class Ipdb(nn.Module):
 
 class PreprocessAtari(nn.Module):
     def forward(self, x):
+        #print("[PreprocessAtari] before permute, x.shape =", x.shape)
         # MJ: I needed to add `contiguous` here;
             # might want to just add this in for students?
         x = x.permute(0, 3, 1, 2).contiguous()
+        #print("[PreprocessAtari] after permute, x.shape =", x.shape)
         return x / 255.
+        #return x.view(x.shape[0], -1)
 
 
 def create_atari_q_network(ob_dim, num_actions):
@@ -563,7 +566,7 @@ class MemoryOptimizedReplayBuffer(object):
             self.obs      = np.empty([self.size] + list(frame.shape), dtype=np.float32 if self.float_obs else np.uint8)
             self.action   = np.empty([self.size],                     dtype=np.int32)
             self.reward   = np.empty([self.size],                     dtype=np.float32)
-            self.done     = np.empty([self.size],                     dtype=np.bool)
+            self.done     = np.empty([self.size],                     dtype=bool)
         self.obs[self.next_idx] = frame
 
         ret = self.next_idx

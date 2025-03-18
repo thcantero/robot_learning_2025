@@ -82,7 +82,7 @@ def sample_trajectory(env, policy, max_path_length, render=False, render_mode=('
         steps += 1
         # If the episode ended, the corresponding terminal value is 1
         # otherwise, it is 0
-        if done or steps > max_path_length:
+        if done or steps >= max_path_length:
             terminals.append(1)
             break
         else:

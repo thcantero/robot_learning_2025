@@ -5,6 +5,11 @@ import Box2D
 from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape, revoluteJointDef, contactListener)
 
 import gym
+
+import gym
+gym.logger.set_level(40)  # Suppress warnings
+gym._gym_disable_underscore_compat = True
+
 from gym import spaces
 from gym.utils import seeding
 
@@ -287,7 +292,7 @@ class LunarLander(gym.Env):
         m_power = 0.0
         if action[0] > 0.0:
             # Main engine
-            m_power = (np.clip(action[0], 0.0,1.0) + 1.0)*0.5   # 0.5..1.0
+            m_power = (np.clip(action[0], 0.0, 1.0) + 1.0) * 0.5   # 0.5..1.0
             assert m_power>=0.5 and m_power <= 1.0
             ox =  tip[0]*(4/SCALE + 2*dispersion[0]) + side[0]*dispersion[1]   # 4 is move a bit downwards, +-2 for randomness
             oy = -tip[1]*(4/SCALE + 2*dispersion[0]) - side[1]*dispersion[1]

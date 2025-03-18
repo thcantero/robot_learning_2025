@@ -6,8 +6,8 @@ import hydra, json
 
 from hw8.roble.infrastructure.rl_trainer import RL_Trainer
 from hw8.roble.agents.explore_or_exploit_agent import ExplorationOrExploitationAgent
-from hw8.roble.agents.dqn_agent import DQNAgent
 from hw8.roble.infrastructure.dqn_utils import get_env_kwargs, PiecewiseSchedule, ConstantSchedule
+from hw8.roble.agents.dqn_agent import DQNAgent
 
 from omegaconf import DictConfig, OmegaConf
 
@@ -47,10 +47,21 @@ def my_app(cfg: DictConfig):
     print(OmegaConf.to_yaml(cfg))
     import os
     print("Command Dir:", os.getcwd())
-    params = vars(cfg)
-    # params.extend(env_args)
+
+    params = OmegaConf.to_container(cfg, resolve=True)
+    #params = vars(cfg)
+    #params.extend(env_args)
+
     for key, value in cfg.items():
         params[key] = value
+
+    my_alg = dict(params["alg"])
+
+    if "optimizer_spec" in my_alg:
+        from hw8.roble.agents.dqn_agent import parse_optimizer_spec
+        my_alg["optimizer_spec"] = parse_optimizer_spec(params["alg"]["optimizer_spec"])
+    
+    params["alg"] = my_alg
 
     params['eps'] = 0.2
     params['exploit_weight_schedule'] = ConstantSchedule(1.0)

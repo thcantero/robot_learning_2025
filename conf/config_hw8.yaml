@@ -1,59 +1,62 @@
 env:
-    env_name: "PointmassHard-v0" ['PointmassEasy-v0', 'PointmassMedium-v0', 'PointmassHard-v0', 'PointmassVeryHard-v0', 'DrunkSpider-v0']
+    env_name: 'MsPacman-v0' # ['LunarLander-v3', 'MsPacman-v0', 'HalfCheetah-v2', 'CartPole-v0']
     max_episode_length: 200
-    exp_name: 'todo'
-    atari: True
+    exp_name: 'q1'
+    atari: False
 
 alg:
-    rl_alg: 'explore_or_exploit' ## RL training algorithm ['explore_exploit', 'cql', 'safe_rl']
-    n_iter: 50000
-    batch_size: 256        ## The min amount of experience to collect before a training update
-    train_batch_size: 256  ## training batch size used for computing gradients of q function or policy
-    eval_batch_size: 1000  ## How much experience should be collected over the environment to evaluate the average reward of a policy
-    use_rnd: True
-    num_exploration_steps: 1000
-    unsupervised_exploration: False
-    offline_exploitation: True
-    cql_alpha: 0.0
-    exploit_rew_shift: 0.0
-    exploit_rew_scale: 1.0
-    rnd_output_size: 5
-    rnd_n_layers: 2
-    rnd_size: 400
-    use_boltzmann: True
-    no_gpu: False
-    gpu_id: 0
-    double_q: True
-    num_agent_train_steps_per_iter: 1 ## Number of training updates after #batch_size experience is collected. 
-    num_critic_updates_per_agent_update: 1 ## Number of training updates after #batch_size experience is collected.
-    learning_starts: 2000  ## How much initial experience to collect before training begins
+    double_q: False #False
+    batch_size: 64 ## The min amount of experience to collect before a training update
+    train_batch_size: 64 ## training batch size used for computing gradients of q function or policy
+    eval_batch_size: 4096 #1000 ## How much experience should be collected over the environment to evaluate the average reward of a policy
+    num_agent_train_steps_per_iter: 2 ## Number of training updates after #batch_size experience is collected. 
+    num_critic_updates_per_agent_update: 2 ## Number of training updates after #batch_size experience is collected.
+    no_gpu: false #use_gpu: False
+    which_gpu: 0 #gpu_id: 0
+    rl_alg: 'dqn' ## RL training algorithm ['dqn', 'ddpg', 'td3', 'sac']
+    use_rnd: true # missing
+    num_exploration_steps: 1000000
+    unsupervised_exploration: true
+    learning_starts: 10000  ## How much initial experience to collect before training begins
     learning_freq: 1 
-    target_update_freq: 1
+    target_update_freq: 10000
     exploration_schedule: 0
-    optimizer_spec:  0
+    exploration_initial_eps: 1.0      # Start with 100% random actions
+    exploration_final_eps: 0.01       # End with 1% random actions
+    exploration_decay_steps: 1e6      # Decay ε over 1M steps
     replay_buffer_size: 1000000
-    frame_history_len: 1
+    frame_history_len: 4
     gamma: 0.99
-    n_layers_critic: 2
-    size_hidden_critic: 64
+    optimizer_spec:
+        constructor: "Adam"
+        optim_kwargs:
+            lr: 0.001
+            eps: 1e-4
+        learning_rate_schedule: "lambda t: 1.0"
     critic_learning_rate: 1e-3
-    eps: 0.2
-    n_layers: 2
-    size: 64
-    learning_rate: 1e-3
+    learning_rate: 1e-4
     ob_dim: 0             # do not modify
     ac_dim: 0             # do not modify
     batch_size_initial: 0 # do not modify
     discrete: True
     grad_norm_clipping: True
+    n_iter: 50_000_000
+    polyak_avg: 0.01 #
+    td3_target_policy_noise: 0.05 #
+    td3_target_policy_noise_clip: 0.1 #
+    entropy_coeff: 0.2 ## SAC entropy coeff
+    policy_std: 0.1
+    nn_baseline: False
+    deterministic: True
     network:
-        layer_sizes: [ 64, 64 ]
+        layer_sizes:  [ 64, 64 ]
         activations: [ "tanh", "tanh" ]
         output_activation: "identity"
 
 logging:
-    video_log_freq: 1 # How often to generate a video to log/
-    scalar_log_freq: 1 # How often to log training information and run evaluation during training.
+    video_log_freq: -1 # How often to generate a video to log/
+    scalar_log_freq: 10000 # How often to log training information and run evaluation during training.
     save_params: false # Should the parameters given to the script be saved? (Always...)
     random_seed: 1234
     logdir: ""
+    debug: false
