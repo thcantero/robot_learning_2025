@@ -1,0 +1,66 @@
+env:
+  env_name: PointmassMedium-v0
+  max_episode_length: 200
+  exp_name: q2_alpha_cql_alpha_0.5
+  atari: false
+alg:
+  double_q: false
+  batch_size: 64
+  train_batch_size: 64
+  eval_batch_size: 4096
+  num_agent_train_steps_per_iter: 2
+  num_critic_updates_per_agent_update: 2
+  no_gpu: false
+  which_gpu: 0
+  rl_alg: dqn
+  use_rnd: true
+  num_exploration_steps: 5000
+  unsupervised_exploration: true
+  learning_starts: 10000
+  learning_freq: 1
+  target_update_freq: 10000
+  exploration_schedule: 0
+  exploration_initial_eps: 1.0
+  exploration_final_eps: 0.01
+  exploration_decay_steps: 1000000.0
+  replay_buffer_size: 1000000
+  frame_history_len: 4
+  gamma: 0.99
+  optimizer_spec:
+    constructor: Adam
+    optim_kwargs:
+      lr: 0.001
+      eps: 0.0001
+    learning_rate_schedule: 'lambda t: 1.0'
+  critic_learning_rate: 0.001
+  learning_rate: 0.0001
+  ob_dim: 0
+  ac_dim: 0
+  batch_size_initial: 0
+  discrete: true
+  grad_norm_clipping: true
+  n_iter: 10000
+  polyak_avg: 0.01
+  td3_target_policy_noise: 0.05
+  td3_target_policy_noise_clip: 0.1
+  entropy_coeff: 0.2
+  policy_std: 0.1
+  nn_baseline: false
+  deterministic: true
+  network:
+    layer_sizes:
+    - 64
+    - 64
+    activations:
+    - tanh
+    - tanh
+    output_activation: identity
+  offline_exploitation: true
+  cql_alpha: 0.5
+logging:
+  video_log_freq: -1
+  scalar_log_freq: 10000
+  save_params: false
+  random_seed: 1234
+  logdir: ''
+  debug: false

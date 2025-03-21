@@ -36,6 +36,19 @@ def parse_optimizer_spec(spec_dict):
 class DQNAgent(object):
     def __init__(self, env, agent_params):
 
+        # Debug: Check the type of agent_params['alg'] before using it
+        print("DEBUG: agent_params['alg'] type inside DQNAgent (before fix) =", type(agent_params['alg']))
+        print("DEBUG: agent_params['alg'] contents inside DQNAgent (before fix) =", agent_params['alg'])
+
+        # Fix: If agent_params['alg'] is a tuple, extract the dictionary
+        if isinstance(agent_params['alg'], tuple):
+            print("WARNING: Detected 'alg' as a tuple inside DQNAgent. Fixing...")
+            agent_params['alg'] = agent_params['alg'][0]  # Convert it back to a dictionary
+
+        # Debug: Verify the fix
+        print("DEBUG: agent_params['alg'] type inside DQNAgent (after fix) =", type(agent_params['alg']))
+        print("DEBUG: agent_params['alg'] contents inside DQNAgent (after fix) =", agent_params['alg'])
+
         self.env = env
         self.agent_params = agent_params
         
@@ -113,6 +126,8 @@ class DQNAgent(object):
             advanced one step, and the replay buffer should contain one more transition.
             Note that self.last_obs must always point to the new latest observation.
         """
+        #print(f"[DEBUG] step_env() last_obs shape: {self.last_obs.shape}, dtype: {self.last_obs.dtype}")
+
 
         #print("[dqn_agent.step_env] self.last_obs shape:", self.last_obs.shape)
         # 1) store current single frame

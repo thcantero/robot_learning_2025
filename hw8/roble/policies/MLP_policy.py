@@ -124,7 +124,16 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         else:
             if self._deterministic:
                 ##  TODO get this from hw3
+                # For deterministic continuous: return mean with zero variance
+                batch_mean = self.mean_net(observation)
+                # Use a very small logstd to approximate deterministic behavior
+                scale_tril = torch.diag(torch.ones(self.ac_dim, device=ptu.device) * 1e-4)
+                batch_scale_tril = scale_tril.repeat(batch_mean.shape[0], 1, 1)
+                action_distribution = distributions.MultivariateNormal(
+                    batch_mean,
+                    scale_tril=batch_scale_tril,)
             else:
+                #Stochastic continuous policy
                 batch_mean = self._mean_net(observation)
                 scale_tril = torch.diag(torch.exp(self._logstd))
                 batch_dim = batch_mean.shape[0]

@@ -1,0 +1,7 @@
+- env.env_name=PointmassMedium-v0
+- alg.use_rnd=True
+- alg.num_exploration_steps=5000
+- +alg.offline_exploitation=True
+- +alg.cql_alpha=0.5
+- alg.unsupervised_exploration=True
+- env.exp_name=q2_alpha_cql_alpha_0.5

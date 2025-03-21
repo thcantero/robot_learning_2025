@@ -40,11 +40,35 @@ class CQLCritic(BaseCritic):
         self.loss = nn.MSELoss()
         self.q_net.to(ptu.device)
         self.q_net_target.to(ptu.device)
-        self.cql_alpha = hparams['alg']['cql_alpha']
+        self.cql_alpha = hparams['alg'].get('cql_alpha', 0.0)
+
+        print(f"DEBUG: CQLCritic Initialized - cql_alpha = {self.cql_alpha}")
+
 
     def dqn_loss(self, ob_no, ac_na, next_ob_no, reward_n, terminal_n):
         """ Implement DQN Loss """
 
+        # Get current Q-values for chosen actions
+        qa_t_values = self.q_net(ob_no).gather(1, ac_na.unsqueeze(1)).squeeze(1)
+        
+        # Compute target Q-values
+        with torch.no_grad():
+            if self.double_q:
+                # Double Q-learning: use online network to select actions
+                next_actions = self.q_net(next_ob_no).argmax(dim=1, keepdim=True)
+                q_next = self.q_net_target(next_ob_no).gather(1, next_actions)
+            else:
+                # Regular DQN: use target network for action selection
+                q_next = self.q_net_target(next_ob_no).max(dim=1)[0]
+            
+            target = reward_n + (1 - terminal_n) * self.gamma * q_next
+        
+        # Get Q-values for current states (for logging)
+        q_t_values = self.q_net(ob_no)
+        
+        # Calculate MSE loss
+        loss = self.loss(qa_t_values, target)
+        
         return loss, qa_t_values, q_t_values
 
 
@@ -64,6 +88,8 @@ class CQLCritic(BaseCritic):
             returns:
                 nothing
         """
+        print("DEBUG: Entering CQL update function")
+
         ob_no = ptu.from_numpy(ob_no)
         ac_na = ptu.from_numpy(ac_na).to(torch.long)
         next_ob_no = ptu.from_numpy(next_ob_no)
@@ -78,17 +104,37 @@ class CQLCritic(BaseCritic):
         # CQL Implementation
         # TODO: Implement CQL as described in the pdf and paper
         # Hint: After calculating cql_loss, augment the loss appropriately
-        q_t_logsumexp = None
-        cql_loss = None
+        q_t = self.q_net(ob_no)
+        q_t_logsumexp = torch.logsumexp(q_t, dim=1)
+        current_action_q = q_t.gather(1, ac_na.unsqueeze(1)).squeeze(1)
+        cql_loss = (q_t_logsumexp - current_action_q).mean() # CQL penalty term
+        total_loss = loss + self.cql_alpha * cql_loss # Total loss = DQN loss + CQL penalty
 
-        info = {'Training Loss': ptu.to_numpy(loss)}
+        print(f"BEFORE UPDATE: Max Q-value: {q_t_values.max().item()}, Min Q-value: {q_t_values.min().item()}")
+
+        self.optimizer.zero_grad()
+        total_loss.backward()
+        nn.utils.clip_grad_norm_(self.q_net.parameters(), self.grad_norm_clipping)
+        self.optimizer.step()
+
+        print(f"AFTER UPDATE: Max Q-value: {q_t_values.max().item()}, Min Q-value: {q_t_values.min().item()}")
+
+        info = {
+        'Training Loss': ptu.to_numpy(total_loss),
+        'CQL Loss': ptu.to_numpy(cql_loss),
+        'Data q-values': ptu.to_numpy(current_action_q).mean(),
+        'OOD q-values': ptu.to_numpy(q_t_logsumexp).mean(),
+        'Max Q-value' : ptu.to_numpy(q_t_values.max())
+        }       
 
         # TODO: Uncomment these lines after implementing CQL
-        # info['CQL Loss'] = ptu.to_numpy(cql_loss)
-        # info['Data q-values'] = ptu.to_numpy(q_t_values).mean()
-        # info['OOD q-values'] = ptu.to_numpy(q_t_logsumexp).mean()
+        info['CQL Loss'] = ptu.to_numpy(cql_loss)
+        info['Data q-values'] = ptu.to_numpy(current_action_q).mean()
+        info['OOD q-values'] = ptu.to_numpy(q_t_logsumexp).mean()
         
         self.learning_rate_scheduler.step()
+        print(f"CQL Loss: {cql_loss.item()}, Max Q-value: {q_t_values.max().item()}, Avg Q-value: {q_t_values.mean().item()}")
+
 
         return info
 

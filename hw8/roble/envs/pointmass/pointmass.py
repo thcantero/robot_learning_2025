@@ -3,6 +3,7 @@ import scipy.sparse.csgraph
 import numpy as np
 import gym
 import pickle
+import os
 
 WALLS = {
     'Small':
@@ -269,11 +270,15 @@ class Pointmass(gym.Env):
       action_noise: (float) Standard deviation of noise to add to actions. Use 0
         to add no noise.
     """
+
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     self.plt = plt
     self.fig = self.plt.figure()
+
+    self.traj_filepath = os.path.join(os.path.dirname(__file__), "trajectory_plots/traj.png")
+    os.makedirs(os.path.dirname(self.traj_filepath), exist_ok=True)  # Ensure directory exists
     
     self.action_dim = self.ac_dim = 2
     self.observation_dim = self.obs_dim = 2
@@ -391,7 +396,7 @@ class Pointmass(gym.Env):
     return best_action
 
   def _discretize_state(self, state, resolution=1.0):
-    (i, j) = np.floor(resolution * state).astype(np.int)
+    (i, j) = np.floor(resolution * state).astype(int)
     # Round down to the nearest cell if at the boundary.
     if i == self._height:
       i -= 1
@@ -469,7 +474,7 @@ class Pointmass(gym.Env):
             g.add_edge((i, j), (i + di, j + dj))
 
     # dist[i, j, k, l] is path from (i, j) -> (k, l)
-    dist = np.full((height, width, height, width), np.float('inf'))
+    dist = np.full((height, width, height, width), float('inf'))
     for ((i1, j1), dist_dict) in nx.shortest_path_length(g):
       for ((i2, j2), d) in dist_dict.items():
         dist[i1, j1, i2, j2] = d

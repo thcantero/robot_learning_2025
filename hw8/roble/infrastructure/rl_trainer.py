@@ -56,10 +56,10 @@ class RL_Trainer(object):
         self.params = params
         self.logger = Logger(self.params['logging']['logdir'])
 
-        # Register any custom environments you have
+        # Register any custom environment
         register_custom_envs()
 
-        # If MsPacman-v0 doesn't exist, you can try MsPacman-v4
+        # If MsPacman-v0 doesn't exist, can try MsPacman-v4
         env_name = self.params['env']['env_name']
         if env_name == "MsPacman-v0":
             env_name = "MsPacman-v4"
@@ -180,6 +180,12 @@ class RL_Trainer(object):
         """
         Train the agent using the replay buffer
         """
+
+        batch_size = self.params['alg']['train_batch_size']
+        if not self.agent.replay_buffer.can_sample(batch_size):
+            print(f"🚨 WARNING: Replay buffer does not have enough samples. Need at least {batch_size} but has less.")
+            return []
+
         print("\nTraining agent from replay buffer data...")
         all_logs = []
         for _ in range(self.params['alg']['num_agent_train_steps_per_iter']):
@@ -196,6 +202,11 @@ class RL_Trainer(object):
         """
         Evaluate & log results
         """
+
+        if len(all_logs) == 0:
+            print("🚨 WARNING: No logs found in this iteration. Skipping logging.")
+            return
+
         last_log = all_logs[-1]
 
         # Evaluate
@@ -206,10 +217,10 @@ class RL_Trainer(object):
             self.params['env']['max_episode_length']
         )
 
-        # If 'paths' is empty (typical for DQN), we avoid NaN
+        # If 'paths' is empty (typical for DQN), avoid NaN
         if len(paths) == 0:
             train_returns = []
-            train_avg_return = 0.0  # or you could do None
+            train_avg_return = 0.0  
         else:
             train_returns = [p["reward"].sum() for p in paths]
             train_avg_return = np.mean(train_returns)
@@ -226,6 +237,9 @@ class RL_Trainer(object):
         logs.update(last_log)
 
         logs["TotalEnvSteps"] = self.total_envsteps
+        if "Max Q-value" in last_log:
+            logs["Max Q Value"] = last_log["Max Q-value"]
+        
 
         for key, value in logs.items():
             print(f"{key} : {value}")

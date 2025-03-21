@@ -101,6 +101,7 @@ class DQNCritic(BaseCritic):
         self.learning_rate_scheduler.step()
         return {
             'Training_Loss': ptu.to_numpy(loss),
+            'Max Q-value': ptu.to_numpy(q_t_values.max())
         }
 
     def update_target_network(self):

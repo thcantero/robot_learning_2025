@@ -27,6 +27,7 @@ class Q_Trainer(object):
             print("Pick a rl_alg first")
             sys.exit()
 
+        print(f"DEBUG: Selected Agent Type - {agent_class}")
         self.params['alg']['train_batch_size'] = params['alg']['batch_size']
 
         # append env args to params
@@ -51,6 +52,10 @@ def my_app(cfg: DictConfig):
     params = OmegaConf.to_container(cfg, resolve=True)
     #params = vars(cfg)
     #params.extend(env_args)
+
+    if isinstance(params["alg"], tuple):
+        print("WARNING: Detected 'alg' as a tuple. Fixing...")
+        params["alg"] = params["alg"][0] 
 
     for key, value in cfg.items():
         params[key] = value
