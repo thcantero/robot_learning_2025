@@ -1,5 +1,5 @@
 env:
-    env_name: 'MsPacman-v0' # ['LunarLander-v3', 'MsPacman-v0', 'HalfCheetah-v2', 'CartPole-v0']
+    env_name: "visual-cube-triple-play-v0" # ['LunarLander-v3', 'MsPacman-v0', 'HalfCheetah-v2', 'CartPole-v0']
     max_episode_length: 200
     exp_name: 'q1'
     atari: False
@@ -15,7 +15,7 @@ alg:
     which_gpu: 0 #gpu_id: 0
     rl_alg: 'dqn' ## RL training algorithm ['dqn', 'ddpg', 'td3', 'sac']
     use_rnd: true # missing
-    num_exploration_steps: 10000
+    num_exploration_steps: 0
     unsupervised_exploration: true
     learning_starts: 10000  ## How much initial experience to collect before training begins
     learning_freq: 1 
@@ -35,8 +35,8 @@ alg:
         learning_rate_schedule: "lambda t: 1.0"
     critic_learning_rate: 1e-3
     learning_rate: 1e-4
-    ob_dim: 0             # do not modify
-    ac_dim: 0             # do not modify
+    ob_dim: 84, 84, 4             # do not modify
+    ac_dim: 6             # do not modify
     batch_size_initial: 0 # do not modify
     discrete: True
     grad_norm_clipping: True

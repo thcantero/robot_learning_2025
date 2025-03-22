@@ -175,3 +175,7 @@ def add_noise(data_inp, noiseToSignal=0.01):
             0, np.absolute(std_of_noise[j]), (data.shape[0],)))
 
     return data
+
+def process_image_obs(obs):
+    # Normalize pixel values to [0, 1] and resize if needed
+    return obs.astype(np.float32) / 255.0

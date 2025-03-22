@@ -11,6 +11,7 @@ import torch.optim as optim
 
 from hw8.roble.infrastructure.atari_wrappers import wrap_deepmind
 from gym.envs.registration import register
+from ogbench import make_env_and_datasets
 
 import torch
 
@@ -104,6 +105,17 @@ def get_env_kwargs(env_name):
             'env_wrappers': lunar_empty_wrapper
         }
         kwargs['exploration_schedule'] = lander_exploration_schedule(kwargs['num_timesteps'])
+
+    elif env_name == "visual-cube-triple-play-v0":
+        # Define parameters specific to OGBench
+        return {
+            'input_shape': (84, 84, 4),  # For image-based observations
+            'ob_dim': None,  # Automatically inferred from environment
+            'ac_dim': None,  # Automatically inferred from environment
+            'max_episode_length': 200,
+            'frame_history_len': 4,
+            'atari': False,  # Not an Atari environment
+        }
 
     # THIS NEEDS TO BE UPDATED
     elif 'Pointmass' in env_name:

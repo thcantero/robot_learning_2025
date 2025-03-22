@@ -34,6 +34,17 @@ MAX_VIDEO_LEN = 40
 import numpy as np
 import gym
 
+from gym.envs.registration import register
+import ogbench
+
+register(
+    id="visual-cube-triple-play-v0",
+    entry_point=lambda: ogbench.make_env_and_datasets(  # Return ONLY the environment
+        dataset_name="visual-cube-triple-play-v0"
+    )[0],  # Extract the first element of the tuple (the env)
+    max_episode_steps=200,
+)
+
 class FixFrameStackDim(gym.ObservationWrapper):
     """
     Reorders environment observations from (4, 84,84,1) -> (84,84,4).
@@ -63,10 +74,20 @@ class RL_Trainer(object):
         env_name = self.params['env']['env_name']
         if env_name == "MsPacman-v0":
             env_name = "MsPacman-v4"
+            
 
-        # Create gym environment
-        self.env = gym.make(env_name)
-        self.eval_env = gym.make(env_name)
+        if "visual-cube" in env_name:
+            # Create OGBench environment
+            # OGBench environments require specific kwargs
+            self.env = gym.make(
+                env_name,
+                env_type="triple",  # Example valid parameter
+                ob_type="pixels",
+                width=64,
+                height=64,
+            )
+        else:
+            self.env = gym.make(env_name)
 
         # Set up video logging
         env_name = self.params['env']['env_name']
@@ -134,6 +155,12 @@ class RL_Trainer(object):
         """
         Main training loop
         """
+            # Disable data collection for offline training
+        if self.params['alg']['offline_exploitation']:
+            self.agent.offline_exploitation = True
+            self.agent.num_exploration_steps = 0  # No exploration steps
+            self.agent.replay_buffer.disable_collection()  # Stop adding new data
+
         self.total_envsteps = 0
         self.start_time = time.time()
 
